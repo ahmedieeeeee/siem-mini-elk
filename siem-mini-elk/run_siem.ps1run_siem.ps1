@@ -1,43 +1,53 @@
 # run_siem.ps1
-# PowerShell workflow to run SIEM mini-system for portfolio demo
+# PowerShell workflow to run SIEM mini-system and take dashboard screenshots
 
-# Step 1: Go to project folder
 cd $PSScriptRoot
 
-# Step 2: Start ELK stack in detached mode
+# Step 1: Start ELK stack
 Write-Host "Starting ELK stack..."
 docker-compose up -d
 
-# Step 3: Wait a few seconds for containers to be ready
-Start-Sleep -Seconds 20
+# Wait for containers to fully start
+Start-Sleep -Seconds 30
 
-# Step 4: Generate demo logs
+# Step 2: Generate demo logs
 Write-Host "Generating demo logs..."
 python .\scripts\generate_nginx.py
 python .\scripts\generate_firewall.py
 
-# Step 5: Tail Logstash logs
-Write-Host "Tailing Logstash logs (press Ctrl+C to stop)..."
-docker logs -f siem-mini-elk-logstash-1
+# Step 3: Tail Logstash logs in background (optional)
+Start-Process powershell -ArgumentList "docker logs -f siem-mini-elk-logstash-1"
 
-# Step 6: Open Kibana dashboard in default browser
+# Step 4: Open Kibana dashboard in default browser
+$kibanaUrl = "http://localhost:5601"
 Write-Host "Opening Kibana dashboard..."
-Start-Process "http://localhost:5601"
+Start-Process $kibanaUrl
 
+# Step 5: Wait for Kibana to fully load
+Write-Host "Waiting for Kibana to load..."
+Start-Sleep -Seconds 20
 
-Usage:
+# Step 6: Take screenshots using Chrome headless
+$screenshotFolder = "$PSScriptRoot\screenshots"
 
-cd "C:\Users\Ahmed Rizwan\Downloads\New folder\siem-mini-elk\siem-mini-elk"
-.\run_siem.ps1
+# Make sure folder exists
+if (-Not (Test-Path $screenshotFolder)) {
+    New-Item -ItemType Directory -Path $screenshotFolder
+}
 
+# Paths for Chrome
+$chromePath = "C:\Program Files\Google\Chrome\Application\chrome.exe"  # Adjust if needed
 
-✅ This will:
+# List of dashboards to capture (URLs)
+$dashboards = @(
+    "http://localhost:5601/app/dashboards#/view/your-nginx-dashboard-id",
+    "http://localhost:5601/app/dashboards#/view/your-firewall-dashboard-id"
+)
 
-Start ELK containers.
+foreach ($dash in $dashboards) {
+    $fileName = $dash -replace '[^a-zA-Z0-9]', '_' + ".png"
+    & $chromePath --headless --disable-gpu --window-size=1920,1080 --screenshot="$screenshotFolder\$fileName" $dash
+    Write-Host "Screenshot saved: $fileName"
+}
 
-Generate demo logs.
-
-Show Logstash logs in real-time.
-
-Open Kibana automatically.
-
+Write-Host "All done! Screenshots are in the 'screenshots' folder."
