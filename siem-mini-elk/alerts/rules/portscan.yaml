@@ -1,0 +1,10 @@
+name: Possible port scan - many destination ports
+type: cardinality
+index: firewall-*
+timeframe:
+  minutes: 1
+query_key: src_ip
+cardinality_field: dpt
+min_cardinality: 20
+alert:
+- debug

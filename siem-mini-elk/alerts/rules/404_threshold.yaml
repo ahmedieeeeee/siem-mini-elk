@@ -1,0 +1,12 @@
+name: Many 404s from single IP
+type: frequency
+index: weblogs-*
+num_events: 20
+timeframe:
+  minutes: 1
+query_key: clientip
+filter:
+- term:
+    status: 404
+alert:
+- debug

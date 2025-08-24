@@ -1,0 +1,19 @@
+# Elastalert2 base configuration
+rules_folder: /usr/src/app/rules
+
+run_every:
+  minutes: 1
+
+buffer_time:
+  minutes: 15
+
+es_host: elasticsearch
+es_port: 9200
+use_ssl: false
+verify_certs: false
+
+# Elastalert writes its own status here
+writeback_index: elastalert_status
+
+alert_time_limit:
+  days: 2

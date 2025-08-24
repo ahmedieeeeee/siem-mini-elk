@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# Data
+data/nginx/*.log
+data/firewall/*.log
+
+# Node/OS junk
+.DS_Store
