@@ -102,3 +102,10 @@ You should see:
 
 ## License
 MIT
+
+---
+
+### Automated Screenshots
+Run `run_siem.ps1` to generate demo logs and automatically take screenshots of dashboards.  
+Screenshots will be saved in the `screenshots` folder.
+
